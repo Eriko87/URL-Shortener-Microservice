@@ -36,13 +36,22 @@ const urlSchema = new Schema({
 });
 let Url = mongoose.model('Url', urlSchema);
 
-//for for shortid. it will be incremented by 1 every time we see a new url
-let number = 0
+//for for shortid. it will be incremented by 1 every time we see a new url in the DB
+let number
+
 
 //Look for existing url info first, then create new url record
 app.post('/api/shorturl/new', (req, res) => {
 let originalUrl = req.body.url;  
 
+Url.find({},function(err, data) {
+  if (err) {
+    res.send(err);
+  }
+    number = data.length
+})  
+  
+    console.log("number of data" + number);
 Url.findOne( {original_url: req.body.url}, function (err, data) {
   let foundUrl
   let foundNumber
@@ -51,6 +60,7 @@ Url.findOne( {original_url: req.body.url}, function (err, data) {
           } else {
             if(!data){
               //create new url
+              console.log(number)
               number = number + 1;
               let newUrl = new Url({
               original_url:originalUrl,
